@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Befehl, der ausgeführt wird, wenn der Container gestartet wird
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:5000", "--workers=4"]
