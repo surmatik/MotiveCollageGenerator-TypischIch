@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  web:
-    build: .
+  typischich-motivecollagegenerator:
+    image: surmatik/typischich-motivecollagegenerator:latest
     ports:
       - "5000:5000"
