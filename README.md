@@ -10,6 +10,10 @@ Folgende Bibliotheken müssen für den Python Script installiert sein:
   ```
 
 ## Verwendung
+1. Github Repository klonen
+   ```sh
+   git clone https://github.com/surmatik/TypischIch-MotiveCollageGenerator.git
+   ```
 1. Lege alle Motive im Ordner [motive](motive) als PNG ab
 2. Führe das Skript [script.js](script.py) aus
     ```sh
