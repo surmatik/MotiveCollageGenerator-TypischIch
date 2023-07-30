@@ -1,5 +1,4 @@
-# Ignore the contents of the "motive" folder
 motive/*
-
-# But do not ignore the "motive" folder itself
 !motive/
+export/*
+!export/
