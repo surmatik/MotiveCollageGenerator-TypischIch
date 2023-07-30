@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motive Collage Generator -Typisch Ich</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: "Courier New", Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            min-width: 500px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 50px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        li {
+            margin: 0 10px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .logo img {
+            width: 150px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+
+        form {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://typischich.shop/wp-content/uploads/2021/02/LOGO-T-Shirt-mit-Maske-weiss-1.png" alt="Logo Typisch Ich">
+        </div>
+        <h1>Motive Collage Generator</h1>
+        <p>Typisch Ich</p>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" multiple> <br>
+            <input type="submit" value="Collagen generieren">
+        </form>
+    </div>
+</body>
+</html>
