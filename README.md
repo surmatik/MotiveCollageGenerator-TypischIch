@@ -4,7 +4,10 @@ Dieser Script [script.js](script.py) erstellt aus allen Motiven im Ordner [motiv
 ## Voraussetzungen
 Folgende Bibliotheken müssen für den Python Script installiert sein:
 - Python 3.x --> [Python Download](https://www.python.org/downloads/)
-- Pillow (Python Imaging Library) --> `pip install pillow`
+- Pillow (Python Imaging Library)
+  ```sh
+  pip install pillow
+  ```
 
 ## Verwendung
 1. Lege alle Motive im Ordner [motive](motive) als PNG ab
