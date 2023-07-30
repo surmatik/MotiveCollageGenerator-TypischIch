@@ -12,6 +12,9 @@ COPY assets /app/assets
 # Installiere die Python-Abhängigkeiten
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Installiere Gunicorn
+RUN pip install gunicorn
+
 # Port, den der Container freigeben soll
 EXPOSE 5000
 
