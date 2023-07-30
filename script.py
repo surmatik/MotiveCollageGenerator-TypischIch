@@ -109,7 +109,7 @@ def main():
         add_watermark(collage, watermark_path, opacity=0.8)
 
         # Collage speichern
-        collage.save(f'export/collage_{i+1}.png')
+        collage.save(f'export/TypischIch_Motive_{i+1}.png')
 
 if __name__ == '__main__':
     main()
