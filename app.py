@@ -1,13 +1,14 @@
 import os
 import math
 import zipfile
+import shutil
+import cairosvg
 from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, render_template, request, send_file
 
 app = Flask(__name__)
 
 def create_collage(images, spacing=90, margin=90):
-    # Berechnen der Anzahl der Reihen und Spalten für die Collage (3x4)
     rows = 3
     cols = 4
     image_width = 340
@@ -20,11 +21,9 @@ def create_collage(images, spacing=90, margin=90):
 
     for i, image in enumerate(images):
         if not isinstance(image, Image.Image):
-            # Falls es kein gültiges Bildobjekt ist, überspringen und warnen
             print(f"Warnung: {image} ist kein gültiges Bildobjekt und wird übersprungen.")
             continue
 
-        # Konvertiere das Bild in den RGBA-Modus, falls es im Palette-Modus mit Transparenz vorliegt
         if image.mode == 'P' and 'transparency' in image.info:
             image = image.convert('RGBA')
 
@@ -33,13 +32,11 @@ def create_collage(images, spacing=90, margin=90):
         x = col * (image_width + spacing) + margin
         y = row * (image_height + spacing) + margin
 
-        # Bild in der Collage einfügen und auf die richtige Größe skalieren
         image.thumbnail((image_width, image_height))
         offset_x = (image_width - image.width) // 2
         offset_y = (image_height - image.height) // 2
         collage.paste(image, (x + offset_x, y + offset_y))
 
-        # Bildtitel hinzufügen
         draw = ImageDraw.Draw(collage)
         font_size = 25
         font = ImageFont.truetype("assets/SansSerifBldFLF.otf", font_size)
@@ -51,7 +48,6 @@ def create_collage(images, spacing=90, margin=90):
         text_y = y + image_height + title_height // 2 - text_height // 2
         draw.text((text_x, text_y), file_name, fill='white', font=font)
 
-    # Graue horizontale Linien zwischen den Bildern hinzufügen
     draw = ImageDraw.Draw(collage)
     for i in range(1, rows):
         y = i * (image_height + spacing) + margin - spacing // 2
@@ -60,14 +56,10 @@ def create_collage(images, spacing=90, margin=90):
     return collage
 
 def add_watermark(collage, watermark_path, opacity=0.5):
-    # Öffne das Wasserzeichenbild
     watermark = Image.open(watermark_path)
-
-    # Vergrößere das Wasserzeichen auf das 1.5-fache der Collage-Größe
     watermark_size = (int(collage.width * 0.75), int(collage.height * 1))
     watermark = watermark.resize(watermark_size, Image.LANCZOS)
 
-    # Passe die Transparenz des Wasserzeichens an
     if opacity < 0.0:
         opacity = 0.0
     elif opacity > 1.0:
@@ -75,11 +67,9 @@ def add_watermark(collage, watermark_path, opacity=0.5):
     watermark = watermark.convert('RGBA')
     watermark_with_opacity = Image.new('RGBA', collage.size, (0, 0, 0, 0))
     
-    # Berechne die Position des Wasserzeichens in der Mitte der Collage
     x = (collage.width - watermark.width) // 2
     y = (collage.height - watermark.height) // 2
 
-    # Füge das Wasserzeichen zur Collage hinzu
     for x_offset in range(watermark.width):
         for y_offset in range(watermark.height):
             r, g, b, a = watermark.getpixel((x_offset, y_offset))
@@ -87,10 +77,40 @@ def add_watermark(collage, watermark_path, opacity=0.5):
     
     collage.paste(watermark_with_opacity, (0, 0), watermark_with_opacity)
 
+def convert_svg_to_png(input_folder, output_folder):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    for filename in os.listdir(input_folder):
+        if filename.lower().endswith(".svg"):
+            input_path = os.path.join(input_folder, filename)
+            output_path = os.path.join(output_folder, filename.replace(".svg", ".png"))
+
+            print(f"Converting and cropping {input_path} to {output_path}")
+
+            try:
+                dpi = 300
+                cairosvg.svg2png(url=input_path, write_to=output_path, dpi=dpi)
+
+                image = Image.open(output_path)
+                bbox = image.getbbox()
+                cropped_image = image.crop(bbox)
+                cropped_image.save(output_path, dpi=(dpi, dpi))
+            except Exception as e:
+                print(f"Failed to convert {input_path}: {e}")
+
+def save_filenames_to_txt(image_paths):
+    with open('Liste_Motive.txt', 'w') as txt_file:
+        txt_file.write("Wähle ein Hobby aus|Wähle ein Hobby aus\n")
+        for image_path in image_paths:
+            filename = os.path.splitext(os.path.basename(image_path))[0]
+            txt_file.write(f"{filename}|{filename}\n")
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Save the uploaded files in the temporary directory
+        # Collage generieren
         uploaded_files = request.files.getlist('file')
         temp_dir = 'temp'
         os.makedirs(temp_dir, exist_ok=True)
@@ -101,7 +121,6 @@ def index():
                 file.save(file_path)
                 image_paths.append(file_path)
 
-        # Calculate the number of required collages
         num_collages = math.ceil(len(image_paths) / 12)
 
         collage_paths = []
@@ -109,25 +128,57 @@ def index():
             collage_images = image_paths[i * 12: (i + 1) * 12]
             collage = create_collage([Image.open(img) for img in collage_images])
 
-            # Add watermark (adjusted as needed)
             watermark_path = 'assets/wasserzeichen.png'
             add_watermark(collage, watermark_path, opacity=0.8)
 
-            # Save the collage
             collage_path = f'collage_{i+1}.png'
             collage.save(collage_path)
             collage_paths.append(collage_path)
 
-        # Create the ZIP file
-        zip_file_path = 'collages.zip'
+        # Dateinamen in TXT-Datei speichern
+        save_filenames_to_txt(image_paths)
+
+        # Collage ZIP erstellen
+        zip_file_path = 'TypischIch_MotiveCollages.zip'
         with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
             for path in collage_paths:
                 zip_file.write(path)
+            zip_file.write('Liste_Motive.txt')  # Dateinamen hinzufügen
 
-        # Download the ZIP file
+        # Temporäre Dateien löschen
+        shutil.rmtree(temp_dir)
+        os.remove('Liste_Motive.txt')
+
+        # ZIP-Datei herunterladen
         return send_file(zip_file_path, as_attachment=True)
 
     return render_template('index.html')
+
+@app.route('/convert_svg', methods=['POST'])
+def convert_svg():
+    uploaded_files = request.files.getlist('svg_file')
+    svg_input_folder = 'svg'
+    os.makedirs(svg_input_folder, exist_ok=True)
+    for file in uploaded_files:
+        if file.filename != '':
+            file_path = os.path.join(svg_input_folder, file.filename)
+            file.save(file_path)
+
+    png_output_folder = 'png'
+    convert_svg_to_png(svg_input_folder, png_output_folder)
+
+    # Erstelle eine ZIP-Datei mit den konvertierten PNGs
+    zip_file_path = 'TypischIch_ConvertedPNGs.zip'
+    with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
+        for png_file in os.listdir(png_output_folder):
+            zip_file.write(os.path.join(png_output_folder, png_file))
+
+    # Lösche temporäre Ordner
+    shutil.rmtree(svg_input_folder)
+    shutil.rmtree(png_output_folder)
+
+    # ZIP-Datei herunterladen
+    return send_file(zip_file_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

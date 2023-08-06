@@ -1,28 +1,48 @@
 # Typisch Ich Motive Collage Generator
-Dieser Script [script.js](script.py) erstellt aus allen Motiven im Ordner [motive](motive) eine Collage im Format von 3 x 4, um diese dann für die Produkt Bilder auf typischich.shop verwenden zu können.
+Diese WebApp erstellt die Collagen für die Produkt Bilder von Typisch Ich.
 
 ## Verwendung
+Webseite ist ereichbar unter: [motive-collage-generator.typischich.shop](https://motive-collage-generator.typischich.shop/)
+
+**Studio3 zu PNG**
+
+1. Design in Silhouette Studio öffnen und lokal speichern
+   Datei → Sichern als → Auf der Festplatte speichern --→rt auswählen
+2. Die .studio3 Dateien mit der Webseite [Studio zu SVG Converter](http://www.ideas-r-us-software.uk/FileConverters/SilhouetteStudioConverter.aspx) zu einem SVG umwandeln
+3. Die umgewandelten SVG Dateien hier auf der Webseite unter `SVG in PNG konvertieren`
+ bei `Dateien hochladen` hochladen und dann auf den Button `konvertieren` klicken
+4. Das ZIP `TypischIch_ConvertedPNGs.zip` extrahieren und die PNGs zu den anderen verschieben
+
+**Collage Generator**
+
+5. Alle Motive im Format PNG hier auf der Webseite unter `Collage generieren` bei `Dateien hochladen` hochladen und dann auf den Button `Collagen generieren` klicken
+6. Das ZIP `TypischIch_MotiveCollages.zip` extrahieren und auf die Webseite hochladen
+
+## Deplyoment
+Bei einem Push in den Main Branach wird mit dem [Dockerfile](Dockerfile) ein Image erstellt und in das [Docker Hub Repository](https://hub.docker.com/repository/docker/surmatik/typischich-motivecollagegenerator/) gepusht.
+
+Das Docker Image kann dadurch via Docker Compose deployed werden.
+```sh
+version: '3'
+
+services:
+  typischich-motivecollagegenerator:
+    image: surmatik/typischich-motivecollagegenerator:latest
+    ports:
+      - "5000:5000"
+```
+
+## Run local
+[Python3](https://www.python.org/downloads/) muss installiert sein
 1. Github Repository klonen
    ```sh
    git clone https://github.com/surmatik/TypischIch-MotiveCollageGenerator.git
    ```
-Für die Collage werden richtig zugeschnittene PNGs von den Studio3 Dateien benötigt.
-
-### Studio3 zu PNG
-2. Die Motive in Silhouette Studio auf der Festplatte speichern
-3. Die .studio3 Dateien mit der Webseite [Studio zu SVG Converter](http://www.ideas-r-us-software.uk/FileConverters/SilhouetteStudioConverter.aspx) zu einem SVG umwandeln und diese dann im Ordner [svg-to-png/svg](svg-to-png/svg) von diesem Repository abspeichern
-4. Den SVG zu PNG script [svg-to-png/script.py](svg-to-png/script.py) ausführen
-   Für den Script muss [Python 3.x](https://www.python.org/downloads/) und die zwei Bibliotheken `cairosvg` und `Pillow` installiert sein
+2. Installiere die erforderlichen Python-Pakete:
    ```sh
-   pip install cairosvg pillow
-
-   python3 script.py
+   pip install -r requirements.txt
    ```
-### Collage Generator
-5. Mit den PNGs kann nun auf der Webseite [motive-collage-generator.typischich.shop](https://motive-collage-generator.typischich.shop/) oder via Script [script.py](script.py) die Collagen generiert werden
-   Für den Script muss [Python 3.x](https://www.python.org/downloads/) und die Bibliothek `Pillow` installiert sein
+3. Installiere die erforderlichen Python-Pakete:
    ```sh
-   pip install pillow
-
-   python3 script.py
+   python3 app.py
    ```

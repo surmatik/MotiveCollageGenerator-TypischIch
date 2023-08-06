@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motive Collage Generator -Typisch Ich</title>
+    <title>Motive Collage Generator - Typisch Ich</title>
+
+    <link rel="icon" type="image/png" href="https://typischich.shop/wp-content/uploads/2021/02/LOGO-T-Shirt-mit-Maske-weiss-1.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
@@ -14,56 +17,63 @@
             padding: 0;
             display: flex;
             justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
             padding: 20px;
-            max-width: 1000px;
-            min-width: 500px;
+            max-width: 1300px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             margin: 50px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .header {
+            flex-basis: 100%;
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         h1 {
             font-size: 24px;
             margin-bottom: 20px;
-            text-align: center;
         }
 
         p {
             font-size: 16px;
             margin-bottom: 10px;
-            text-align: center;
         }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
+        strong {
+            color: #9afff2; /* Ändere hier die gewünschte Farbe */
+            font-weight: bold;
         }
 
-        li {
-            margin: 0 10px;
+        a {
+            color: #fff;
         }
 
         .logo {
             text-align: center;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         .logo img {
-            width: 150px;
+            max-width: 200px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             border-radius: 50%;
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         }
 
-        form {
-            margin-top: 40px;
-            margin-bottom: 40px;
+        .form-container {
+            flex-basis: calc(50% - 60px); /* 50% der Breite mit 10px Abstand */
+            margin-bottom: 20px;
         }
 
         form {
@@ -89,20 +99,80 @@
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
+
+        /* Styles für den Container "SVG in PNG konvertieren" */
+        .svg-to-png-container, .collage-container {
+            width: calc(50% - 60px);
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .svg-to-png-container h2, .collage-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .header {
+                flex-direction: column;
+            }
+
+            .logo img {
+                max-width: 150px;
+            }
+
+            .form-container {
+                flex-basis: 100%;
+            }
+        }
     </style>
 
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <img src="https://typischich.shop/wp-content/uploads/2021/02/LOGO-T-Shirt-mit-Maske-weiss-1.png" alt="Logo Typisch Ich">
+        <div class="header">
+            <div class="logo">
+                <img src="https://typischich.shop/wp-content/uploads/2021/02/LOGO-T-Shirt-mit-Maske-weiss-1.png" alt="Typisch Ich">
+            </div>
+            <p>Typisch Ich</p>
+            <h1>Motive Collage Generator</h1>
         </div>
-        <h1>Motive Collage Generator</h1>
-        <p>Typisch Ich</p>
-        <form action="/" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" multiple> <br>
-            <input type="submit" value="Collagen generieren">
-        </form>
+
+        <div class="form-container svg-to-png-container">
+            <h2>SVG in PNG konvertieren</h2>
+            <form action="/convert_svg" method="post" enctype="multipart/form-data">
+                <input type="file" name="svg_file" multiple> <br> <br>
+                <input type="submit" value="Konvertieren">
+            </form>
+        </div>
+
+        <div class="form-container collage-container">
+            <h2>Collage generieren</h2>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" multiple> <br> <br>
+                <input type="submit" value="Collagen generieren">
+            </form>
+        </div>
+
+        <div class="instructions">
+            <h2>Verwendung</h2>
+            <h3>Studio3 zu PNG</h3>
+            <ol>
+                <li>Design in Silhouette Studio öffnen und lokal speichern <br> Datei → Sichern als → Auf der Festplatte speichern → auswählen</li>
+                <li>Die .studio3 Dateien mit der Webseite <a href="http://www.ideas-r-us-software.uk/FileConverters/SilhouetteStudioConverter.aspx" target="_blank">Studio zu SVG Converter</a> zu einem SVG umwandeln</li>
+                <li>Die umgewandelten SVG Dateien hier auf der Webseite unter <strong>SVG in PNG konvertieren</strong> bei <strong>Dateien hochladen</strong> hochladen und dann auf den Button <strong>konvertieren</strong> klicken</li>
+                <li>Das ZIP <strong>TypischIch_ConvertedPNGs.zip</strong> extrahieren und die PNGs zu den anderen verschieben</li>
+            </ol>
+        
+            <h3>Collage Generator</h3>
+            <ol start="5">
+                <li>Alle Motive im Format PNG hier auf der Webseite unter <strong>Collage generieren</strong> bei <strong>Dateien hochladen</strong> hochladen und dann auf den Button <strong>Collagen generieren</strong> klicken</li>
+                <li>Das ZIP <strong>TypischIch_MotiveCollages.zip</strong> extrahieren und auf die Webseite hochladen</li>
+            </ol>
+        </div>
+        
     </div>
 </body>
 </html>
