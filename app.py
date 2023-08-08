@@ -121,6 +121,9 @@ def index():
                 file.save(file_path)
                 image_paths.append(file_path)
 
+        # Sortiere die Liste der Bildpfade nach dem ABC
+        image_paths.sort(key=lambda path: os.path.basename(path).lower())
+
         num_collages = math.ceil(len(image_paths) / 12)
 
         collage_paths = []
@@ -131,7 +134,7 @@ def index():
             watermark_path = 'assets/wasserzeichen.png'
             add_watermark(collage, watermark_path, opacity=0.8)
 
-            collage_path = f'collage_{i+1}.png'
+            collage_path = os.path.join(temp_dir, f'collage_{i+1}.png')  # Collagen-Dateipfad im temp-Ordner
             collage.save(collage_path)
             collage_paths.append(collage_path)
 
@@ -139,16 +142,17 @@ def index():
         save_filenames_to_txt(image_paths)
 
         # Collage ZIP erstellen
-        zip_file_path = 'TypischIch_MotiveCollages.zip'
+        zip_file_path = os.path.join(temp_dir, 'TypischIch_MotiveCollages.zip')  # ZIP-Dateipfad im temp-Ordner
         with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
             for path in collage_paths:
                 zip_file.write(path)
             zip_file.write('Liste_Motive.txt')  # Dateinamen hinzufügen
 
-        # Temporäre Dateien löschen
-        shutil.rmtree(temp_dir)
+        # Temporäre Dateien löschen (nur die Collagen-Dateien und ZIP-Datei im temp-Ordner)
+        for path in collage_paths:
+            os.remove(path)
         os.remove('Liste_Motive.txt')
-
+        
         # ZIP-Datei herunterladen
         return send_file(zip_file_path, as_attachment=True)
 
