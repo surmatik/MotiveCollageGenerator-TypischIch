@@ -142,13 +142,14 @@ def index():
         save_filenames_to_txt(image_paths)
 
         # Collage ZIP erstellen
-        zip_file_path = os.path.join(temp_dir, 'TypischIch_MotiveCollages.zip')  # ZIP-Dateipfad im temp-Ordner
+        zip_file_path = 'TypischIch_MotiveCollages.zip'
         with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
+            # Füge Collage-Bilder direkt zum ZIP hinzu (ohne temp-Ordner)
             for path in collage_paths:
-                zip_file.write(path)
+                zip_file.write(path, os.path.basename(path))
             zip_file.write('Liste_Motive.txt')  # Dateinamen hinzufügen
 
-        # Temporäre Dateien löschen (nur die Collagen-Dateien und ZIP-Datei im temp-Ordner)
+        # Temporäre Dateien löschen
         for path in collage_paths:
             os.remove(path)
         os.remove('Liste_Motive.txt')
