@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+
+    <link rel="icon" type="image/png" href="https://typischich.shop/wp-content/uploads/2021/02/LOGO-T-Shirt-mit-Maske-weiss-1.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://typischich.shop/wp-content/uploads/2021/02/LOGO-T-Shirt-mit-Maske-weiss-1.png" alt="Typisch Ich">
+        </div>
+        <h2 class="menu-item">Typisch Ich Tools</h2>
+        <a href="/" class="menu-item">Home</a>
+        <a href="/svg-to-png" class="menu-item">SVG in PNG konvertieren</a>
+        <a href="/collage-generieren" class="menu-item">Collage generieren</a>
+        <a href="/hilfe" class="menu-item">Hilfe</a>
+    </div>
+
+    <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+    </div>  
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>Erstellt von <a href="https://linoo.ch">Lino</a></p>
+        <a href="https://github.com/surmatik/TypischIch-MotiveCollageGenerator" target="_blank">
+            <i class="fab fa-github"></i>
+            Surmatik/TypischIch-MotiveCollageGenerator
+        </a>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

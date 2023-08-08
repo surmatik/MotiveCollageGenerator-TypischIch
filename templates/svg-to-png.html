@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>SVG in PNG konvertieren</h1>
+
+    <div class="tool-container">
+        <div class="form-container svg-to-png-container">
+            <form action="/convert_svg" method="post" enctype="multipart/form-data" id="upload-form">
+                <div class="file-input">
+                    <label for="file-input" class="file-label">
+                        <span class="label-text">SVG-Dateien auswählen</span>
+                        <input type="file" name="file" id="file-input" multiple>
+                    </label>
+                </div>
+                <div class="drag-drop-area" id="drag-drop-area">
+                    <i class="fas fa-file-upload"></i>
+                    <p class="drag-drop-text">SVG-Dateien hierhin ziehen oder klicken, um auszuwählen</p>
+                    <span id="file-count">0</span>
+                </div>
+                <button type="submit" class="submit-button">Konvertieren</button>
+                <div class="uploaded-files" id="uploaded-files-list"></div>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}

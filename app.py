@@ -6,7 +6,7 @@ import cairosvg
 from PIL import Image, ImageDraw, ImageFont
 from flask import Flask, render_template, request, send_file
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 def create_collage(images, spacing=90, margin=90):
     rows = 3
@@ -157,7 +157,7 @@ def index():
         # ZIP-Datei herunterladen
         return send_file(zip_file_path, as_attachment=True)
 
-    return render_template('index.html')
+    return render_template('index.html', page_title='Motive Collage Generator')
 
 @app.route('/convert_svg', methods=['POST'])
 def convert_svg():
@@ -184,6 +184,21 @@ def convert_svg():
 
     # ZIP-Datei herunterladen
     return send_file(zip_file_path, as_attachment=True)
+
+@app.route('/svg-to-png')
+def pagesvgtopng():
+    return render_template('svg-to-png.html', page_title='SVG zu PNG konvertieren')
+
+@app.route('/collage-generieren')
+def pagecollagegenerieren():
+    return render_template('collage-generieren.html', page_title='Collage Generieren')
+
+@app.route('/hilfe')
+def pagehilfe():
+    return render_template('hilfe.html', page_title='Hilfe')
+
+app.static_folder = 'static'
+app.static_url_path = '/static'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

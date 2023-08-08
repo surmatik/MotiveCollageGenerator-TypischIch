@@ -1,0 +1,240 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f1f2f4;
+}
+
+.sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #222;
+    color: #fff;
+    height: 100vh;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.logo {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    max-width: 150px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.menu-item {
+    padding: 10px 20px;
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+    background-color: #444;
+}
+
+.main-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.main-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.tool-container {
+    text-align: left;
+    margin-top: 20px;
+    padding: 20px ;
+    background-color: #f9fafb;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    margin-top: -14px;
+    margin-left: 270px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #aaa;
+    text-align: left;
+    display: flex;
+}
+
+footer a {
+    color: #aaa;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+footer a i {
+    margin-right: 5px;
+    margin-left: 10px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+}
+
+input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.file-input {
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.file-input input[type="file"] {
+    display: none;
+}
+
+.label-text {
+    display: inline-block;
+    padding: 5px 10px;
+}
+
+.drag-drop-area {
+    border: 2px dashed #ccc;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.drag-drop-text {
+    font-size: 16px;
+    color: #777;
+}
+
+.submit-button {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover,
+.file-label:hover {
+    background-color: #2980b9;
+}
+
+/* Hamburger-Menü */
+.hamburger {
+    display: none; /* Standardmäßig ausgeblendet auf größeren Bildschirmen */
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    cursor: pointer;
+    z-index: 2; /* Über Sidebar, aber unter Inhalt */
+}
+
+.mobile-menu-toggle {
+    display: none; /* Verstecke das Menü standardmäßig auf Desktop */
+    font-size: 24px;
+    color: #000;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    transition: transform 0.3s;
+}
+
+.mobile-menu-toggle.open {
+    transform: rotate(45deg);
+}
+
+.sidebar-open {
+    transform: translateX(0);
+}
+
+.hamburger i {
+    font-size: 24px;
+    color: #000;
+}
+
+@media (max-width: 768px) {
+    /* Zeige das Menü nur auf Mobilgeräten */
+    .mobile-menu-toggle {
+        display: block;
+    }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    /* ... (Vorheriger Media Query-Code) ... */
+
+    .sidebar {
+        width: 250px; /* Zurück zur normalen Breite */
+        transform: translateX(-100%); /* Standardmäßig ausgeblendet */
+        z-index: 1;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.active {
+        transform: translateX(0); /* Zeigt die Sidebar an */
+    }
+
+    .hamburger {
+        display: block; /* Anzeigen des Hamburger-Menüs auf kleineren Bildschirmen */
+    }
+
+    .content {
+        margin-left: 0; /* Kein seitlicher Abstand auf kleinen Bildschirmen */
+    }
+
+    footer {
+        margin-left: 0; /* Kein seitlicher Abstand auf kleinen Bildschirmen */
+    }
+}
