@@ -3,8 +3,9 @@ import math
 import zipfile
 import shutil
 import cairosvg
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from flask import Flask, render_template, request, send_file
+from urllib.parse import quote as url_quote
 
 app = Flask(__name__)
 
@@ -21,61 +22,47 @@ def create_collage(images, spacing=90, margin=90):
 
     for i, image in enumerate(images):
         if not isinstance(image, Image.Image):
-            print(f"Warnung: {image} ist kein gültiges Bildobjekt und wird übersprungen.")
+            print(f"Warning: {image} is not a valid image object and will be skipped.")
             continue
 
-        if image.mode == 'P' and 'transparency' in image.info:
-            image = image.convert('RGBA')
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+
+        image.thumbnail((image_width, image_height))
 
         row = i // cols
         col = i % cols
         x = col * (image_width + spacing) + margin
         y = row * (image_height + spacing) + margin
 
-        image.thumbnail((image_width, image_height))
         offset_x = (image_width - image.width) // 2
         offset_y = (image_height - image.height) // 2
         collage.paste(image, (x + offset_x, y + offset_y))
 
-        draw = ImageDraw.Draw(collage)
-        font_size = 25
-        font = ImageFont.truetype("assets/SansSerifBldFLF.otf", font_size)
-        file_name = os.path.splitext(os.path.basename(image.filename))[0]
-        text_bbox = draw.textbbox((x, y + image_height, x + image_width, y + image_height + title_height), file_name, font=font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
-        text_x = x + (image_width - text_width) // 2
-        text_y = y + image_height + title_height // 2 - text_height // 2
-        draw.text((text_x, text_y), file_name, fill='white', font=font)
-
-    draw = ImageDraw.Draw(collage)
-    for i in range(1, rows):
-        y = i * (image_height + spacing) + margin - spacing // 2
-        draw.line((margin, y, collage_width - margin, y), fill='gray', width=10)
+        del image
 
     return collage
 
+
 def add_watermark(collage, watermark_path, opacity=0.5):
-    watermark = Image.open(watermark_path)
+    # Open the watermark and resize it
+    watermark = Image.open(watermark_path).convert("RGBA")
     watermark_size = (int(collage.width * 0.75), int(collage.height * 1))
     watermark = watermark.resize(watermark_size, Image.LANCZOS)
 
-    if opacity < 0.0:
-        opacity = 0.0
-    elif opacity > 1.0:
-        opacity = 1.0
-    watermark = watermark.convert('RGBA')
-    watermark_with_opacity = Image.new('RGBA', collage.size, (0, 0, 0, 0))
-    
-    x = (collage.width - watermark.width) // 2
-    y = (collage.height - watermark.height) // 2
+    # Apply opacity to the watermark
+    watermark = watermark.convert("RGBA")
+    alpha = watermark.split()[3]  # Extract the alpha channel
+    alpha = ImageEnhance.Brightness(alpha).enhance(opacity)  # Modify transparency
+    watermark.putalpha(alpha)
 
-    for x_offset in range(watermark.width):
-        for y_offset in range(watermark.height):
-            r, g, b, a = watermark.getpixel((x_offset, y_offset))
-            watermark_with_opacity.putpixel((x + x_offset, y + y_offset), (r, g, b, int(a * opacity)))
+    # Paste the watermark onto the collage
+    collage.paste(watermark, ((collage.width - watermark.width) // 2, 
+                              (collage.height - watermark.height) // 2), watermark)
     
-    collage.paste(watermark_with_opacity, (0, 0), watermark_with_opacity)
+    # Close the watermark image to free memory
+    watermark.close()
+
 
 def convert_svg_to_png(input_folder, output_folder):
     if not os.path.exists(output_folder):
@@ -86,16 +73,17 @@ def convert_svg_to_png(input_folder, output_folder):
             input_path = os.path.join(input_folder, filename)
             output_path = os.path.join(output_folder, filename.replace(".svg", ".png"))
 
-            print(f"Converting and cropping {input_path} to {output_path}")
-
             try:
-                dpi = 300
+                dpi = 150
                 cairosvg.svg2png(url=input_path, write_to=output_path, dpi=dpi)
 
                 image = Image.open(output_path)
                 bbox = image.getbbox()
-                cropped_image = image.crop(bbox)
-                cropped_image.save(output_path, dpi=(dpi, dpi))
+                if bbox:
+                    cropped_image = image.crop(bbox)
+                    cropped_image.save(output_path, dpi=(dpi, dpi))
+
+                image.close()
             except Exception as e:
                 print(f"Failed to convert {input_path}: {e}")
 

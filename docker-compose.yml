@@ -2,6 +2,8 @@ version: '3'
 
 services:
   typischich-motivecollagegenerator:
-    image: surmatik/typischich-motivecollagegenerator:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"

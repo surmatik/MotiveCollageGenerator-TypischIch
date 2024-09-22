@@ -9,14 +9,14 @@ COPY app.py requirements.txt /app/
 COPY templates /app/templates
 COPY assets /app/assets
 
-# Installiere die Python-Abhängigkeiten
+RUN pip install --upgrade Flask Werkzeug
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Installiere Gunicorn
 RUN pip install gunicorn
 
 # Port, den der Container freigeben soll
 EXPOSE 5000
 
 # Befehl, der ausgeführt wird, wenn der Container gestartet wird
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:5000", "--workers=4"]
+CMD ["gunicorn", "--worker-class", "gevent", "--bind", "0.0.0.0:5000", "app:app"]
