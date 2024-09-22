@@ -9,7 +9,7 @@ from urllib.parse import quote as url_quote
 
 app = Flask(__name__)
 
-def create_collage(images, spacing=90, margin=90):
+def create_collage(images, image_paths, spacing=90, margin=90):
     rows = 3
     cols = 4
     image_width = 340
@@ -19,8 +19,9 @@ def create_collage(images, spacing=90, margin=90):
     collage_height = image_height * rows + spacing * (rows - 1) + 2 * margin + title_height
 
     collage = Image.new('RGB', (collage_width, collage_height), color='black')
+    draw = ImageDraw.Draw(collage)
 
-    for i, image in enumerate(images):
+    for i, (image, image_path) in enumerate(zip(images, image_paths)):
         if not isinstance(image, Image.Image):
             print(f"Warning: {image} is not a valid image object and will be skipped.")
             continue
@@ -28,6 +29,7 @@ def create_collage(images, spacing=90, margin=90):
         if image.mode != 'RGB':
             image = image.convert('RGB')
 
+        # Resize the image
         image.thumbnail((image_width, image_height))
 
         row = i // cols
@@ -39,9 +41,24 @@ def create_collage(images, spacing=90, margin=90):
         offset_y = (image_height - image.height) // 2
         collage.paste(image, (x + offset_x, y + offset_y))
 
-        del image
+        # Draw the file name below the image
+        font_size = 25
+        font = ImageFont.truetype("assets/SansSerifBldFLF.otf", font_size)
+        file_name = os.path.splitext(os.path.basename(image_path))[0]
+        text_bbox = draw.textbbox((x, y + image_height, x + image_width, y + image_height + title_height), file_name, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
+        text_x = x + (image_width - text_width) // 2
+        text_y = y + image_height + (title_height // 2) - (text_height // 2)
+        draw.text((text_x, text_y), file_name, fill='white', font=font)
+
+    # Draw lines between rows
+    for i in range(1, rows):
+        y = i * (image_height + spacing) + margin - spacing // 2
+        draw.line((margin, y, collage_width - margin, y), fill='gray', width=10)
 
     return collage
+
 
 
 def add_watermark(collage, watermark_path, opacity=0.5):
@@ -98,7 +115,7 @@ def save_filenames_to_txt(image_paths):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Collage generieren
+        # Collage generation
         uploaded_files = request.files.getlist('file')
         temp_dir = 'temp'
         os.makedirs(temp_dir, exist_ok=True)
@@ -109,40 +126,39 @@ def index():
                 file.save(file_path)
                 image_paths.append(file_path)
 
-        # Sortiere die Liste der Bildpfade nach dem ABC
+        # Sort the image paths alphabetically
         image_paths.sort(key=lambda path: os.path.basename(path).lower())
 
         num_collages = math.ceil(len(image_paths) / 12)
 
         collage_paths = []
         for i in range(num_collages):
-            collage_images = image_paths[i * 12: (i + 1) * 12]
-            collage = create_collage([Image.open(img) for img in collage_images])
+            collage_images = [Image.open(img) for img in image_paths[i * 12: (i + 1) * 12]]
+            collage = create_collage(collage_images, image_paths[i * 12: (i + 1) * 12])
 
             watermark_path = 'assets/wasserzeichen.png'
             add_watermark(collage, watermark_path, opacity=0.8)
 
-            collage_path = os.path.join(temp_dir, f'collage_{i+1}.png')  # Collagen-Dateipfad im temp-Ordner
+            collage_path = os.path.join(temp_dir, f'collage_{i+1}.png')  # Collage file path in the temp folder
             collage.save(collage_path)
             collage_paths.append(collage_path)
 
-        # Dateinamen in TXT-Datei speichern
+        # Save file names to TXT
         save_filenames_to_txt(image_paths)
 
-        # Collage ZIP erstellen
+        # Create ZIP file with the collages
         zip_file_path = 'TypischIch_MotiveCollages.zip'
         with zipfile.ZipFile(zip_file_path, 'w') as zip_file:
-            # Füge Collage-Bilder direkt zum ZIP hinzu (ohne temp-Ordner)
             for path in collage_paths:
                 zip_file.write(path, os.path.basename(path))
-            zip_file.write('Liste_Motive.txt')  # Dateinamen hinzufügen
+            zip_file.write('Liste_Motive.txt')  # Add file names
 
-        # Temporäre Dateien löschen
+        # Delete temporary files
         for path in collage_paths:
             os.remove(path)
         os.remove('Liste_Motive.txt')
         
-        # ZIP-Datei herunterladen
+        # Download ZIP file
         return send_file(zip_file_path, as_attachment=True)
 
     return render_template('index.html')
